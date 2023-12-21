@@ -5,6 +5,6 @@ services:
     image: seliba/booru-bot:latest
     restart: unless-stopped
     volumes:
-      - ${PWD}/database.sqlite:/app/database.sqlite
-      - ${PWD}/token.txt:/app/token.txt
+      - ${PWD}/config.yml:/app/config.yml
+      - ${PWD}/data.yml:/app/data.yml
       - ${PWD}/logs/:/app/logs/
