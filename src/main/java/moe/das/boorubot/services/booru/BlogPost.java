@@ -14,6 +14,14 @@ public class BlogPost {
         this.url = url;
     }
 
+    public static BlogPost fromRssItem(Item item) {
+        var titel = item.getTitle().orElseThrow();
+        var description = item.getDescription().orElseThrow().replaceAll("<span class=\"screen-reader-text\">.*</span>", "");
+        var link = item.getLink().orElseThrow();
+
+        return new BlogPost(titel, description, link);
+    }
+
     public String getTitle() {
         return title;
     }
@@ -26,24 +34,16 @@ public class BlogPost {
         return url;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public String getImageUrl() {
         return imageUrl;
     }
 
-    public boolean hasImage() {
-        return imageUrl != null;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public static BlogPost fromRssItem(Item item) {
-        var titel = item.getTitle().orElseThrow();
-        var description = item.getDescription().orElseThrow().replaceAll("<span class=\"screen-reader-text\">.*</span>", "");
-        var link = item.getLink().orElseThrow();
-
-        return new BlogPost(titel, description, link);
+    public boolean hasImage() {
+        return imageUrl != null;
     }
 
     @Override
