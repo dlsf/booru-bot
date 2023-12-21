@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  bot:
+    image: seliba/booru-bot:latest
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/database.sqlite:/app/database.sqlite
+      - ${PWD}/token.txt:/app/token.txt
+      - ${PWD}/logs/:/app/logs/
