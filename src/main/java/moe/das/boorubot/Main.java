@@ -24,7 +24,7 @@ public class Main {
         }
 
         var authToken = config.getString("auth-token");
-        var cooldownTime = config.getInt("cooldownBetweenPostsMinutes");
+        var cooldownTime = config.getInt("cooldown-between-posts-minutes");
         logger.info("Found anilist auth token");
 
         var anilistService = new AnilistService(authToken);

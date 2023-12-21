@@ -40,7 +40,7 @@ public class PostScheduler {
     public void schedulePost(BlogPost blogPost) {
         stack.add(blogPost);
         storageService.setPostStatus(blogPost, StorageService.PostStatus.PENDING);
-        logger.info("Scheduled new blog entry post... " + blogPost.toString());
+        logger.info("Scheduled new blog entry post... " + blogPost);
     }
 
     private void checkQueue() {
