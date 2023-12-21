@@ -21,14 +21,15 @@ public class PostScheduler {
     private final BooruService booruService;
     private final AnilistService anilistService;
     private final StorageService storageService;
-    private final Duration cooldownDuration = Duration.of(30, ChronoUnit.MINUTES);
+    private final Duration cooldownDuration;
     private long nextPostTimestamp = 0;
 
-    public PostScheduler(BooruService booruService, AnilistService anilistService, StorageService storageService) {
+    public PostScheduler(BooruService booruService, AnilistService anilistService, StorageService storageService, long cooldownTime) {
         this.stack = new Stack<>();
         this.booruService = booruService;
         this.anilistService = anilistService;
         this.storageService = storageService;
+        this.cooldownDuration = Duration.of(cooldownTime, ChronoUnit.MINUTES);
     }
 
     public void scheduleTasks() {

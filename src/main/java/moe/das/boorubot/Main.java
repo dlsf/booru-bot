@@ -24,12 +24,13 @@ public class Main {
         }
 
         var authToken = config.getString("auth-token");
+        var cooldownTime = config.getInt("cooldownBetweenPostsMinutes");
         logger.info("Found anilist auth token");
 
         var anilistService = new AnilistService(authToken);
         var booruService = new BooruService();
         var storageService = new StorageService();
-        var postScheduler = new PostScheduler(booruService, anilistService, storageService);
+        var postScheduler = new PostScheduler(booruService, anilistService, storageService, cooldownTime);
         postScheduler.scheduleTasks();
 
         logger.info("Scheduled tasks");
