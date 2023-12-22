@@ -79,7 +79,9 @@ public class PostScheduler {
                         }
                     })
                     .filter(blogPost -> storageService.getPostStatus(blogPost) != StorageService.PostStatus.POSTED)
+                    .filter(blogPost -> !stack.contains(blogPost))
                     .forEach(this::schedulePost);
+            logger.info("Checked for new posts");
         } catch (IOException exception) {
             logger.error("Failed to check for new blog posts", exception);
         }

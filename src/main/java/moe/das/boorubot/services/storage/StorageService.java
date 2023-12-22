@@ -22,7 +22,7 @@ public class StorageService {
     }
 
     public void setPostStatus(BlogPost blogPost, PostStatus postStatus) {
-        this.yamlFile.set(blogPost.getTitle(), postStatus.name());
+        this.yamlFile.set(blogPost.getId(), postStatus.name());
 
         try {
             this.yamlFile.save();
@@ -32,7 +32,7 @@ public class StorageService {
     }
 
     public PostStatus getPostStatus(BlogPost blogPost) {
-        var status = this.yamlFile.getString(blogPost.getTitle());
+        var status = this.yamlFile.getString(blogPost.getId());
         if (status == null) return PostStatus.UNKNOWN;
 
         return PostStatus.valueOf(status);
