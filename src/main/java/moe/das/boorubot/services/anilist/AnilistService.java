@@ -21,7 +21,7 @@ public class AnilistService {
 
     public boolean postBlogEntry(BlogPost blogPost) throws IOException {
         if (blogPost.hasImage()) {
-            return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%s<br>img500(%s)<p><h6>[About this post](https://anilist.co/activity/662233680)</h6></center>", blogPost.getTitle(), blogPost.getDescription(), blogPost.getImageUrl()));
+            return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%simg500(%s)<p><h6>[About this post](https://anilist.co/activity/662233680)</h6></center>", blogPost.getTitle(), blogPost.getDescription(), blogPost.getImageUrl()));
         } else {
             return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%s<p><h6>[About this post](https://anilist.co/activity/662233680)</h6></center>", blogPost.getTitle(), blogPost.getDescription()));
         }
