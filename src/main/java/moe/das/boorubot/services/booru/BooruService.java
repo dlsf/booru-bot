@@ -10,14 +10,30 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * Handles the communication with the public SakugaBooru RSS feed.
+ */
 public class BooruService {
     private static final Pattern imagePattern = Pattern.compile("<a[^<>]*href=\"(?<link>[^\"]+)\"[^<]*<img[^<>]*src=\"(?<img>[^\"]+)\"[^<]*</a>");
 
+    /**
+     * Checks the RSS feed and contains a list of the (by default 10) latest blog posts.
+     *
+     * @return the latest blog posts
+     * @throws IOException if the communication with SakugaBooru failed
+     */
     public Stream<BlogPost> fetchBlogPosts() throws IOException {
         var rssReader = new RssReader();
         return rssReader.read("https://blog.sakugabooru.com/feed/").map(BlogPost::fromRssItem);
     }
 
+    /**
+     * Attempts to scrape images for each blog entry from the HTML of the SakugaBooru website.
+     * This is prone to break, but currently the only way.
+     *
+     * @return a list of all {@link BlogImage}s that can be found on the homepage of SakugaBooru
+     * @throws IOException if the communication with SakugaBooru failed
+     */
     public List<BlogImage> scrapeImages() throws IOException {
         final OkHttpClient client = new OkHttpClient.Builder().build();
         var request = new Request.Builder()

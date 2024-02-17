@@ -11,9 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+/**
+ * The entry point of this app.
+ */
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    /**
+     * The entry point of this app.
+     */
     public static void main(String[] args) {
         logger.info("Starting service...");
 
@@ -22,6 +28,7 @@ public class Main {
         var authToken = config.getString("auth-token");
         var cooldownTime = config.getInt("cooldown-between-posts-minutes");
         var infoUrl = config.getString("info-url");
+
         logger.info("Successfully read config");
 
         // Initialize & Start services
@@ -34,6 +41,11 @@ public class Main {
         logger.info("Initialized services");
     }
 
+    /**
+     * Loads the YAML configuration of this application, creating an empty one if it's not present.
+     *
+     * @return the {@link YamlConfiguration} of this application
+     */
     private static YamlConfiguration initConfig() {
         var config = new YamlFile("config.yml");
 

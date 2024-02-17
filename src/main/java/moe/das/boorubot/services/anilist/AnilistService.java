@@ -10,17 +10,33 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+/**
+ * Handles the communication with the public anilist GraphQL API.
+ */
 public class AnilistService {
     private static final Logger logger = LoggerFactory.getLogger(AnilistService.class);
     private static final OkHttpClient client = new OkHttpClient.Builder().build();
     private final String authToken;
     private final String infoUrl;
 
+    /**
+     * Handles the communication with the public anilist GraphQL API.
+     *
+     * @param authToken the auth token provided by anilist
+     * @param infoUrl an url to further information about the bot
+     */
     public AnilistService(String authToken, String infoUrl) {
         this.authToken = authToken;
         this.infoUrl = infoUrl;
     }
 
+    /**
+     * Immediately posts the provided {@link BlogPost} to anilist.
+     *
+     * @param blogPost the blog post which should be posted
+     * @return true if the operation was successful
+     * @throws IOException if there was an exception while communicating with the anilist API
+     */
     public boolean postBlogEntry(BlogPost blogPost) throws IOException {
         if (blogPost.hasImage()) {
             return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%simg500(%s)<p><h6>[About this post](%s)</h6></center>", blogPost.getTitle(), blogPost.getDescription(), blogPost.getImageUrl(), infoUrl));
@@ -29,6 +45,13 @@ public class AnilistService {
         }
     }
 
+    /**
+     * Creates a new status post with the provided text on anilist via the GraphQL API.
+     *
+     * @param text the text that should be sent
+     * @return true if the operation was successful
+     * @throws IOException if there was an exception while communicating with the anilist API
+     */
     private boolean postAnilistStatus(String text) throws IOException {
         var query = """
                 mutation($text: String) {
@@ -42,6 +65,14 @@ public class AnilistService {
         return callGraphQL(query, variables);
     }
 
+    /**
+     * Performs a raw GraphQL call to the anilist API.
+     *
+     * @param query the GraphQL query of this call
+     * @param variables the variables that belong to the query
+     * @return true if the operation was successful
+     * @throws IOException if there was an exception while communicating with the anilist API
+     */
     private boolean callGraphQL(String query, String variables) throws IOException {
         var requestBody = new FormBody.Builder()
                 .add("query", query)
