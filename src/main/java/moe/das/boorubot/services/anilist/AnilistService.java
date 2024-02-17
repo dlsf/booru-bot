@@ -12,18 +12,20 @@ import java.io.IOException;
 
 public class AnilistService {
     private static final Logger logger = LoggerFactory.getLogger(AnilistService.class);
-    private final OkHttpClient client = new OkHttpClient.Builder().build();
+    private static final OkHttpClient client = new OkHttpClient.Builder().build();
     private final String authToken;
+    private final String infoUrl;
 
-    public AnilistService(String authToken) {
+    public AnilistService(String authToken, String infoUrl) {
         this.authToken = authToken;
+        this.infoUrl = infoUrl;
     }
 
     public boolean postBlogEntry(BlogPost blogPost) throws IOException {
         if (blogPost.hasImage()) {
-            return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%simg500(%s)<p><h6>[About this post](https://anilist.co/activity/662233680)</h6></center>", blogPost.getTitle(), blogPost.getDescription(), blogPost.getImageUrl()));
+            return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%simg500(%s)<p><h6>[About this post](%s)</h6></center>", blogPost.getTitle(), blogPost.getDescription(), blogPost.getImageUrl(), infoUrl));
         } else {
-            return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%s<p><h6>[About this post](https://anilist.co/activity/662233680)</h6></center>", blogPost.getTitle(), blogPost.getDescription()));
+            return postAnilistStatus(String.format("<center><h1>%s</h1><hr>%s<p><h6>[About this post](%s)</h6></center>", blogPost.getTitle(), blogPost.getDescription(), infoUrl));
         }
     }
 
@@ -37,10 +39,10 @@ public class AnilistService {
                 }
                 """;
         String variables = String.format("{\"text\": \"%s\"}", StringEscapeUtils.escapeJson(text));
-        return callGraphQLService(query, variables);
+        return callGraphQL(query, variables);
     }
 
-    private boolean callGraphQLService(String query, String variables) throws IOException {
+    private boolean callGraphQL(String query, String variables) throws IOException {
         var requestBody = new FormBody.Builder()
                 .add("query", query)
                 .add("variables", variables)

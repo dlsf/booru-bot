@@ -1,4 +1,4 @@
-package moe.das.boorubot.services.storage;
+package moe.das.boorubot.storage;
 
 import moe.das.boorubot.services.booru.BlogPost;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class StorageService {
-    private static final Logger logger = LoggerFactory.getLogger(StorageService.class);
+public class YamlStorageService implements StorageService {
+    private static final Logger logger = LoggerFactory.getLogger(YamlStorageService.class);
     private final YamlFile yamlFile;
 
-    public StorageService() {
+    public YamlStorageService() {
         this.yamlFile = new YamlFile("data.yml");
 
         try {
@@ -21,6 +21,7 @@ public class StorageService {
         }
     }
 
+    @Override
     public void setPostStatus(BlogPost blogPost, PostStatus postStatus) {
         this.yamlFile.set(blogPost.getId(), postStatus.name());
 
@@ -31,16 +32,11 @@ public class StorageService {
         }
     }
 
+    @Override
     public PostStatus getPostStatus(BlogPost blogPost) {
         var status = this.yamlFile.getString(blogPost.getId());
         if (status == null) return PostStatus.UNKNOWN;
 
         return PostStatus.valueOf(status);
-    }
-
-    public enum PostStatus {
-        UNKNOWN,
-        PENDING,
-        POSTED
     }
 }

@@ -11,28 +11,32 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class BooruService {
-    private final Pattern imagePattern = Pattern.compile("<a[^<>]*href=\"(?<link>[^\"]+)\"[^<]*<img[^<>]*src=\"(?<img>[^\"]+)\"[^<]*</a>");
+    private static final Pattern imagePattern = Pattern.compile("<a[^<>]*href=\"(?<link>[^\"]+)\"[^<]*<img[^<>]*src=\"(?<img>[^\"]+)\"[^<]*</a>");
 
     public Stream<BlogPost> fetchBlogPosts() throws IOException {
         var rssReader = new RssReader();
         return rssReader.read("https://blog.sakugabooru.com/feed/").map(BlogPost::fromRssItem);
     }
 
-    public List<BlogImage> extractImages() throws IOException {
+    public List<BlogImage> scrapeImages() throws IOException {
         final OkHttpClient client = new OkHttpClient.Builder().build();
         var request = new Request.Builder()
                 .url("https://blog.sakugabooru.com/")
                 .get()
                 .build();
 
-        var html = client.newCall(request).execute().body().string().replace("\n", "");
-        var matcher = imagePattern.matcher(html);
+        try (var response = client.newCall(request).execute()) {
+            var htmlBody = response.body();
+            if (htmlBody == null) return List.of();
+            var html = htmlBody.string().replace("\n", "");
 
-        List<BlogImage> images = new ArrayList<>();
-        while (matcher.find()) {
-            images.add(new BlogImage(matcher.group("link"), matcher.group("img")));
+            var images = new ArrayList<BlogImage>();
+            var matcher = imagePattern.matcher(html);
+            while (matcher.find()) {
+                images.add(new BlogImage(matcher.group("link"), matcher.group("img")));
+            }
+
+            return images;
         }
-
-        return images;
     }
 }

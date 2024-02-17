@@ -2,10 +2,11 @@ package moe.das.boorubot.services.booru;
 
 import com.apptasticsoftware.rssreader.Item;
 
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 public class BlogPost {
-    private final Pattern idPattern = Pattern.compile("https://blog.sakugabooru.com/\\d{4}/\\d{2}/\\d{2}/(?<id>.+)/(?:\\?.+)?");
+    private static final Pattern idPattern = Pattern.compile("https://blog.sakugabooru.com/\\d{4}/\\d{2}/\\d{2}/(?<id>.+)/(?:\\?.+)?");
     private final String title;
     private final String description;
     private final String url;
@@ -17,7 +18,7 @@ public class BlogPost {
         this.url = url;
     }
 
-    public static BlogPost fromRssItem(Item item) {
+    public static BlogPost fromRssItem(Item item) throws NoSuchElementException {
         var titel = item.getTitle().orElseThrow();
         var description = item.getDescription().orElseThrow().replaceAll("<span class=\"screen-reader-text\">.*</span>", "");
         var link = item.getLink().orElseThrow();

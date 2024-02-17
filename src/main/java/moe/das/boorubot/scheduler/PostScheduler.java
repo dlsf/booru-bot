@@ -1,9 +1,10 @@
-package moe.das.boorubot.services.scheduler;
+package moe.das.boorubot.scheduler;
 
 import moe.das.boorubot.services.anilist.AnilistService;
 import moe.das.boorubot.services.booru.BlogPost;
 import moe.das.boorubot.services.booru.BooruService;
-import moe.das.boorubot.services.storage.StorageService;
+import moe.das.boorubot.storage.PostStatus;
+import moe.das.boorubot.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +18,10 @@ import java.util.concurrent.TimeUnit;
 
 public class PostScheduler {
     private static final Logger logger = LoggerFactory.getLogger(PostScheduler.class);
-    private final Stack<BlogPost> stack;
     private final BooruService booruService;
     private final AnilistService anilistService;
     private final StorageService storageService;
+    private final Stack<BlogPost> stack;
     private final Duration cooldownDuration;
     private long nextPostTimestamp = 0;
 
@@ -32,14 +33,20 @@ public class PostScheduler {
         this.cooldownDuration = Duration.of(cooldownTime, ChronoUnit.MINUTES);
     }
 
-    public void scheduleTasks() {
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(this::checkQueue, 10, 10, TimeUnit.SECONDS);
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(this::checkForNewPosts, 0, 15, TimeUnit.MINUTES);
+    public void start() {
+        try (var executorService = Executors.newSingleThreadScheduledExecutor()) {
+            executorService.scheduleWithFixedDelay(this::checkQueue, 10, 10, TimeUnit.SECONDS);
+            executorService.scheduleWithFixedDelay(this::checkForNewPosts, 0, 15, TimeUnit.MINUTES);
+
+            logger.info("Successfully scheduled tasks!");
+        }
     }
 
     public void schedulePost(BlogPost blogPost) {
+        if (stack.contains(blogPost)) return;
+
         stack.add(blogPost);
-        storageService.setPostStatus(blogPost, StorageService.PostStatus.PENDING);
+        storageService.setPostStatus(blogPost, PostStatus.PENDING);
         logger.info("Scheduled new blog entry post... " + blogPost);
     }
 
@@ -54,12 +61,11 @@ public class PostScheduler {
             var success = anilistService.postBlogEntry(Objects.requireNonNull(post));
 
             if (success) {
-                logger.info("Successfully published blog post activity");
-                logger.info("Writing to storage...");
-                storageService.setPostStatus(post, StorageService.PostStatus.POSTED);
+                logger.info("Successfully published blog post activity! Writing to storage...");
+                storageService.setPostStatus(post, PostStatus.POSTED);
                 logger.info("Wrote to storage");
             } else {
-                logger.error("Failed to post status");
+                logger.error("Failed to post status, retrying...");
                 nextPostTimestamp = System.currentTimeMillis();
             }
         } catch (IOException exception) {
@@ -70,15 +76,16 @@ public class PostScheduler {
 
     private void checkForNewPosts() {
         try {
-            var images = booruService.extractImages();
+            var images = booruService.scrapeImages();
             booruService.fetchBlogPosts()
                     .peek(blogPost -> {
+                        // Try to assign manually scraped images to every blog post
                         for (var image : images) {
-                            if (!blogPost.getUrl().contains(image.getEntryUrl())) continue;
-                            blogPost.setImageUrl(image.getImageUrl());
+                            if (!blogPost.getUrl().contains(image.entryUrl())) continue;
+                            blogPost.setImageUrl(image.imageUrl());
                         }
                     })
-                    .filter(blogPost -> storageService.getPostStatus(blogPost) != StorageService.PostStatus.POSTED)
+                    .filter(blogPost -> storageService.getPostStatus(blogPost) != PostStatus.POSTED)
                     .filter(blogPost -> !stack.contains(blogPost))
                     .forEach(this::schedulePost);
             logger.info("Checked for new posts");
