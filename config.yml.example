@@ -1,2 +1,3 @@
 auth-token: <AL_AUTH_TOKEN>
 cooldown-between-posts-minutes: 30
+info-url: https://anilist.co/activity/123
