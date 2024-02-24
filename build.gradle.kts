@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.apptasticsoftware:rssreader:3.5.0")
+    implementation("com.apptasticsoftware:rssreader:3.6.0")
     implementation("org.apache.commons:commons-text:1.11.0")
     implementation("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4")
     implementation("ch.qos.logback:logback-classic:1.5.0")
