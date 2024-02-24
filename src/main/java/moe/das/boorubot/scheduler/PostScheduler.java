@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class PostScheduler {
     private static final Logger logger = LoggerFactory.getLogger(PostScheduler.class);
+    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private final BooruService booruService;
     private final AnilistService anilistService;
     private final StorageService storageService;
@@ -51,12 +53,8 @@ public class PostScheduler {
      * Starts the schedulers needed for this service.
      */
     public void start() {
-        try (var executorService = Executors.newSingleThreadScheduledExecutor()) {
-            executorService.scheduleWithFixedDelay(this::checkForNewPosts, 0, 15, TimeUnit.MINUTES);
-            executorService.scheduleWithFixedDelay(this::checkQueue, 10, 10, TimeUnit.SECONDS);
-
-            logger.info("Successfully scheduled tasks!");
-        }
+        executorService.scheduleWithFixedDelay(this::checkForNewPosts, 0, 15, TimeUnit.MINUTES);
+        executorService.scheduleWithFixedDelay(this::checkQueue, 10, 10, TimeUnit.SECONDS);
     }
 
     /**
