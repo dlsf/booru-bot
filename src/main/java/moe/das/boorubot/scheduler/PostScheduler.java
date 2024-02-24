@@ -55,6 +55,8 @@ public class PostScheduler {
     public void start() {
         executorService.scheduleWithFixedDelay(this::checkForNewPosts, 0, 15, TimeUnit.MINUTES);
         executorService.scheduleWithFixedDelay(this::checkQueue, 10, 10, TimeUnit.SECONDS);
+
+        logger.info("Successfully scheduled tasks!");
     }
 
     /**
