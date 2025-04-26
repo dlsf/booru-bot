@@ -1,5 +1,8 @@
 # BooruBot
 
+> [!IMPORTANT]
+> [This project has been moved to Codeberg](https://codeberg.org/das/booru-bot)
+
 A Java application which automatically reposts SakugaBooru RSS feed entries to AL via the GraphQL API.
 
 ## Running the bot
